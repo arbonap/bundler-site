@@ -1,0 +1,106 @@
+___
+title: Usando Bundler solamente con Ruby
+---
+.container.guide
+  %h2 Montando Bundler
+
+  .contents
+    .bullet
+      .description
+        Configura la ruta de carga para que todas las dependencias en
+        su Gemfile pueden ser requerídas
+    :code
+      # lang: ruby
+      require 'rubygems'
+      require 'bundler/setup'
+      require 'nokogiri'
+
+    .bullet
+      .description
+        Agrega solamente gemas de grupos específicos
+        a la ruta de carga. Si desea las gemas en el grupo
+        por defecto, inclúyelo
+      :code
+        # lang: ruby
+        require 'rubygems'
+        require 'bundler'
+        Bundler.setup(:default, :ci)
+        require 'nokogiri'
+      = link_to 'Aprende más: Grupos', './groups.html', class: 'btn btn-primary'
+
+    %h2 Compatibilidad
+
+    .contents
+      .bullet
+        .description
+          Ambos Ruby 2.0 y RubyGems 2.0 requieren Bundler 1.3 o después. Si usted tiene preguntas sobre la compatibilidad entre Bundler y su sistema, por favor chequee la lista de compatibilidad.
+        = link_to 'Aprende más: Compatibilidad', '/compatibility.html', class: 'btn btn-primary'
+
+      %h2#setting-up-your-application-to-use-bundler
+        Configurando su Applicación para Usar Bundler
+
+      .bullet
+        .description
+          Bundler asegura que Ruby pueda encontrar todas las gemas en el <code>Gemfile</code>
+          (y todas sus dependencias). Si su aplicación es una aplicación de Rails,
+          su aplicación por defecto ya tiene el código necesario para invocar a bundler.
+
+      .bullet
+        .description
+          Para otro tipo de aplicación (por ejemplo como una aplicación Sinatra), usted necesitará
+          configurar bundler antes de intentar de requirir otras gemas. Al principio del primer archivo
+          que su aplicación carga (para Sinatra, el archivo que llama <code>require 'sinatra'</code>),
+          ponga el código siguiente:
+
+        :code
+          # lang: ruby
+          require 'rubygems'
+          require 'bundler/setup'
+
+      .bullet
+        .description
+          Esto automáticamente descubre su <code>Gemfile</code>, y hace que todas
+          las gemas en su <code>Gemfile</code> disponibles a Ruby (en terminos
+          téchnicos, pone las gemas "en la ruta de carga"). Usted puede pensarlo
+          como una manera de agregar extra súperpoderes a <code>require 'rubygems'</code>.
+
+      .bullet
+        .description
+          Ahora que su código está disponible a Ruby, usted puede requerir
+          las gemas que necesite. Por ejemplo, usted puede <code>require 'sinatra'</code>.
+          Si tiene muchas dependencias, usted podría decir "requiere todas las
+          gemas en mi <code>Gemfile</code>". Para hacer esto, ponga el código
+          siguiente inmediatamente después de <code>require 'bundler/setup'</code>:
+
+        :code
+          # lang: ruby
+          Bundler.require(:default)
+        Para nuestro ejemplo Gemfile, esta línea es lo mismo que:
+
+        :code
+          # lang: ruby
+          require 'rails'
+          require 'rack-cache'
+          require 'nokogiri'
+      .bullet
+        .description
+          Desarrolladores astutos notarán que la manera correcta para requerir
+          la gema <code>rack-cache</code> es <code>require 'rack/cache'</code>,
+          no <code>require 'rack-cache'</code>. Para decirle a bundler como usar
+          <code>require 'rack/cache'</code>, actualiza su Gemfile:
+
+        :code
+          # lang: ruby
+          source 'https://rubygems.org'
+
+          gem 'rails', '5.0.0'
+          gem 'rack-cache', :require => 'rack/cache'
+          gem 'nokogiri', '~> 1.4.2'
+      .bullet
+        .description
+          Para ser un <code>Gemfile</code> tan pequeño, avisamos que no haga
+          <code>Bundler.require</code> y sólo requiere las gemas por mano
+          (especialmente por el hecho que se necesita <code>:require</code> en
+          el <code>Gemfile</code>). Para los <code>Gemfile</code>s muchos más grandes,
+          usando <code>Bundler.require</code> permite uno no tener que repetir
+          muchos de los mismos requisitos.
